@@ -53,6 +53,9 @@ def experiment_plot(request, object_id):
     g = Gnuplot.Gnuplot()
     g("set term svg")
     g("set output '%s'" % tfile)
+    g('set xlabel "DC Magnetic field (Oe)"')
+    g('set ylabel "dE/dH (mV/cm.Oe)"')
+
     g.plot( Gnuplot.Data(data, with_='lp'))
     del g
     response = HttpResponse(mimetype="image/svg+xml")

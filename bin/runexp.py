@@ -22,6 +22,8 @@ os.environ["DJANGO_SETTINGS_MODULE"] = "robotarm.settings"
 
 from  robotarm.controller.models import *
 
+serialport1 = "/dev/ttyUSB0"
+serialport2 = "/dev/ttyUSB1"
 
 def send(cmd):
     print cmd
@@ -39,9 +41,10 @@ def readField():
 
     while True:
         try:
-            time.sleep(2)
-            send("measure1")
-            fs = s.readline().strip()
+            time.sleep(5)
+            s2.write("measure1\r\n")
+            fs = s2.readline().strip()
+            print fs
             if "Error" in fs:
                 print "Retry"
                 raise Exception(fs)
@@ -49,15 +52,14 @@ def readField():
             f = float(fs.strip()[1:-2])
             if fs[0] == "-":
                 f *= -1.
-            ok = s.readline()
+            print f
+            ok = s2.readline()
             return f
         except Exception, e:
-            print e
+            print e, fs
             time.sleep(2)
-            send("++clr")
-            send("++ifc")
-            send("status")
-            print s.readline()
+            s2.write("status\r\n")
+            print s2.readline()
             time.sleep(2)
 
 def readR():
@@ -68,19 +70,21 @@ def readR():
     return float(s.readline())*1000
 
 
-def init():
+def init(aclvl=2.4, freq=1000):
     send("++auto 1")
     send("++addr 7")
     send("++eos 2")
 
     send("OUTX 1")
-    send("SLVL 2.4")
+    send("SLVL %f" % aclvl)
     send("OFLT 9")
     send("SENS 23")
-    send("FREQ 1000")
+    send("FREQ %d" % freq)
 
     send("++eos 0")
     setDC(0.0)
+    s2.write("range:2\r\n")
+    s2.readline()
 
 
 def setACField(goal, dc):
@@ -125,7 +129,16 @@ def frange(x,y,z):
         a += y
 
 def runexperiment(experiment):
-    init()
+    pstr = experiment.parameters
+    params = pstr.split()
+    params = [ p.split("=") for p in params ]
+    params = dict(params)
+    if "aclvl" in params:
+        params["aclvl"] = float(params["aclvl"].strip())
+    if "freq" in params:
+        params["freq"] = int(params["freq"].strip())
+
+    init(**params)
 
     dc = 0.0
     for goal in frange(0.0, 0.02, 1.0):
@@ -134,6 +147,7 @@ def runexperiment(experiment):
         time.sleep(3)
         x = readField()
         y = readR()
+        print x,y
         yield x,y
     setDC(0.0)
 
@@ -146,7 +160,7 @@ def send_notification(experiment, TEST):
     import smtplib
     if not TEST:
         SERVER = smtplib.SMTP('smtp.vt.edu')
-    fromaddr = "no-reply@vt.edu"
+    fromaddr = "noreply.cimss@vt.edu"
     toaddrs = [ str(experiment.user.email) ]
     msg = ("From: %s\r\nTo: %s\r\n" % (fromaddr, ", ".join(toaddrs)))
     msg += "Subject: Experiment Complete\r\n\r\n";
@@ -180,8 +194,9 @@ def main(args):
     if options.test:
         runner = runtest(experiment)
     else:
-        serialport = "/dev/ttyUSB0"
-        s = serial.Serial(serialport, timeout = 3)
+        global s,s2
+        s = serial.Serial(serialport1, timeout = 3)
+        s2 = serial.Serial(serialport2, timeout = 5)
         runner = runexperiment(experiment)
     for x,y in runner:
         data = Data(x=x, y=y, experiment=experiment)
