@@ -1,0 +1,23 @@
+<html>
+<head>
+	<title>Remote Laboratory Controller</title>
+	{% block script %}
+	{% endblock %}
+</head>
+<body {%block body%}{%endblock%}>
+	{% block navbar %}
+	<div class="header" style="float: right; clear: left;">
+		<a href="/">Home</a> |
+		<a href="/experiment/create">Create Experiment</a> |
+		<a href="/experiment">View Experiments</a> |
+		<a href="/experiment/compare">Compare Experiments</a> |
+
+		<a href="/admin">Admin</a>
+	</div>
+	{% endblock %}
+	<br/>
+	<hr />
+{% block content %}
+{% endblock %}
+</body>
+</html>

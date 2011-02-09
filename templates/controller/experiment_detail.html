@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block script %}
+{% if object.started and not object.finished %}
+<script type="text/javascript">
+	img = new Image();
+	cache =  new Image();
+	name = "/experiment/{{object.id}}/plot";
+	function start() {
+		code = ( (new Date()).getTime());
+		img.src = name;
+		cache.src = name + "?" + code;
+		document.body.appendChild(img);
+		window.setTimeout('next('+code+')', 5000);
+	}
+	function next(last) {
+		img.src = name + "?" + last;
+		code = ( (new Date()).getTime());
+		cache.src = name + "?" + code;
+		window.setTimeout('next('+code+')', 5000);
+			
+	}
+	window.onload=start;
+{% endif %}
+</script>
+{% endblock %}
+{% block content %}
+<h2>Experiment: {{object.description}}</h2>
+<table>
+	<tr> <th>Queued</th><td> {{ object.queued}} </td></tr>
+	<tr> <th>Started</th> <td>{{ object.started }} </td></tr>
+       	<tr> <th>Finished</th> <td>{{ object.finished }} </td> </tr>
+</table>
+
+{% if object.finished %}
+<p> <img src="/experiment/{{object.id}}/plot" /></p>
+
+<p>To download data in CSV format click <a href="/experiment/{{object.id}}/csv">here</a>.</p>
+{% else %}
+{% if object.started %} 
+<h3>Preliminary results available via the graph </h3>
+{% else %}
+<h2> Experiment has not begun, waiting for results</h2>
+{% endif %}
+{% endif %}
+{% endblock %}

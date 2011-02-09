@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<br/>
+{% if form.errors %}
+<p> Please  check the input </p>
+{% endif %}
+
+<center>
+<form method="post" action="/experiment/create"/> 
+{% csrf_token %}
+<table>
+{{ form }} 
+</table>
+<input type="submit" value="Save" />
+</form>
+</center>
+{% endblock %}

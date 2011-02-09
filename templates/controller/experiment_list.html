@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Experiments</h2>
+<table border='1'>
+	<tr>
+		<th>Queued</th>
+		<th>Description</th>
+		<th>Started</th>
+		<th>Finished</th>
+	</tr>
+{% for experiment  in object_list %}
+<tr>
+	<td>{{ experiment.queued }} </td>
+	<td><a href="{{experiment.get_absolute_url}}">{{ experiment.description }} </a></td>
+	<td>{{ experiment.started }} </td>
+	<td>{{ experiment.finished }} </td>
+</tr>
+{% endfor %}
+</table>
+{% endblock %}

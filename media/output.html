@@ -1,0 +1,27 @@
+<html>
+        <head>
+                <title>Test</title>
+                <script type="text/javascript">
+                        img = new Image();
+                        cache =  new Image();
+                        name = "output.svg";
+                        function start() {
+                                code = ( (new Date()).getTime());
+                                img.src = name;
+                                cache.src = name + "?" + code;
+                                document.body.appendChild(img);
+                                window.setTimeout('next('+code+')', 5000);
+                        }
+                        function next(last) {
+                                img.src = name + "?" + last;
+                                code = ( (new Date()).getTime());
+                                cache.src = name + "?" + code;
+                                window.setTimeout('next('+code+')', 5000);
+                        }
+                </script>
+
+        </head>
+
+        <body onload="start()">
+        </body>
+</html>
