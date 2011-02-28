@@ -3,14 +3,34 @@
 {% block navbar %}
 {% endblock %}
 
-<h2> Please Login to TeleLab</h2>
+<h2> Please Login to access TeleLab</h2>
 {% block content %}
+<table width="100%">
+	<tr>
+	<td>
+	<p style="text-align:center"><img src="/media/setup.jpg" /> </p>
+	<ul>
+	<li>Control experimental parameters such as AC and DC magnetic field strength and AC field frequency</li>
+	<li>After sample is loaded, you may initialize the experiment from the comfort of your home</li>
+	<li>Connect on Skype for live video feed of the experiment while it runs</li>
+	</ul>
+	</td>
+	<td>
+		<p style="text-align: center"><img src="/media/graph.png" /> </p>
+		<ul><li>Graphical data can be monitored real-time and is downloaded immediately after experiment finishes </li></ul>
+	<p style="color: red">
+	Mail material sample to:<br/>
+	310 Durham Hall<br/>
+	Blacksburg, VA 24060<br/>
+	ATTN: Dr. Shashank Priya<br/>
+	</p>
+	</td>
+	<td valign="top" >
 <br/>
 {% if form.errors %}
 <p>Your username and password didn't match. Please try again.</p>
 {% endif %}
 
-<center>
 <form method="post" action="{% url django.contrib.auth.views.login %}">
 {% csrf_token %}
 <table>
@@ -27,5 +47,7 @@
 <input type="submit" value="login" />
 <input type="hidden" name="next" value="{{ next }}" />
 </form>
-</center>
+</td>
+</tr>
+</table>
 {% endblock %}

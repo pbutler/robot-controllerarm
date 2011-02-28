@@ -15,5 +15,6 @@ urlpatterns = patterns('', #controller.views',
      (r'^experiment/(?P<object_id>\d+)/csv$', 'controller.views.experiment_csv'),
      (r'^experiment$', 'django.views.generic.list_detail.object_list', info_dict),
      (r'^experiment/compare/', 'controller.views.compare'),
+     (r'^register/', 'controller.views.user_create'),
      (r'^$', 'controller.views.index'),
 )

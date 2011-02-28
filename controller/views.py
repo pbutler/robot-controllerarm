@@ -4,6 +4,8 @@ from django.shortcuts import render_to_response
 from django.contrib.auth.decorators import login_required
 from django.template import RequestContext
 from controller.models import *
+from django.contrib.auth.models import User
+from django import forms
 
 import csv
 import Gnuplot
@@ -114,3 +116,43 @@ def compare(request):
         return render_to_response('controller/experiment_compare.html', {
             "object_list" : objects
         }, context_instance=RequestContext(request))
+
+class UserForm(forms.Form):
+    username = forms.CharField(max_length=100, label="User Name")
+    email = forms.EmailField(label="E-Mail Address")
+    password1 = forms.CharField(max_length=100, widget=forms.PasswordInput,
+            label="Password")
+    password2 = forms.CharField(max_length=100, widget=forms.PasswordInput,
+            label="Verify Password")
+
+    def clean_username(self):
+        uname = self.cleaned_data["username"]
+        try:
+            u = User.objects.get(username__exact=uname)
+            raise forms.ValidationError("User %s already exists." % uname )
+        except User.DoesNotExist:
+            pass
+        return uname
+
+    def clean(self):
+        cd = self.cleaned_data
+        password1 = self.cleaned_data["password1"]
+        password2 = self.cleaned_data["password2"]
+
+        if password1 != password2:
+            raise forms.ValidationError("Passwords do not match")
+
+        return cd
+
+def user_create(request):
+    if request.method == "POST":
+        form = UserForm(request.POST)
+        if form.is_valid():
+            user = User.objects.create_user( form.cleaned_data['username'], form.cleaned_data['email'], form.cleaned_data['password1'])
+            user.save()
+            return render_to_response('controller/register_done.html' , {}, context_instance=RequestContext(request))
+    else:
+        form = UserForm()
+    return render_to_response('controller/register.html' , {
+        "form" : form
+    }, context_instance=RequestContext(request))

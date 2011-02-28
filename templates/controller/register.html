@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+
+{% block content %}
+<br/>
+{% if form.errors %}
+<p color="red"> Please  check the input </p>
+{% endif %}
+
+<center>
+	<form method="post" action="/register/"/>
+{% csrf_token %}
+<table>
+	{{ form }}
+</table>
+<input type="submit" value="Create User" />
+</form>
+Please choose a username and password:
+</center>
+{% endblock %}
